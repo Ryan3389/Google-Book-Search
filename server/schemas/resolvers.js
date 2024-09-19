@@ -4,7 +4,7 @@ const { User } = require("../models");
 
 const resolvers = {
     Query: {
-        me: async (parent, args, context) => {
+        getMe: async (parent, args, context) => {
             if (!context.user) {
                 throw AuthenticationError;
             }
@@ -24,7 +24,7 @@ const resolvers = {
     },
 
     Mutation: {
-        createUser: async (parent, args) => {
+        addUser: async (parent, args) => {
             const user = await User.create(args);
 
             if (!user) {
@@ -34,7 +34,7 @@ const resolvers = {
             return { token: token, user: user };
         },
 
-        login: async (parent, { email, password }) => {
+        loginUser: async (parent, { email, password }) => {
             const user = await User.findOne({ email: email });
             if (!user) {
                 throw AuthenticationError;
@@ -67,7 +67,7 @@ const resolvers = {
             }
         },
 
-        deleteBook: async (parent, args, context) => {
+        removeBook: async (parent, args, context) => {
             if (!context.user) {
                 throw AuthenticationError;
             }
