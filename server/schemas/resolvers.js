@@ -4,7 +4,7 @@ const { User } = require("../models");
 
 const resolvers = {
     Query: {
-        getMe: async (parent, args, context) => {
+        me: async (parent, args, context) => {
             if (!context.user) {
                 throw AuthenticationError;
             }
@@ -25,11 +25,12 @@ const resolvers = {
 
     Mutation: {
         addUser: async (parent, args) => {
-            const user = await User.create(args);
-
-            if (!user) {
-                return { message: "Something is wrong!" };
+            const existingUser = await User.findOne({ email: args.email });
+            if (existingUser) {
+                throw new Error('User with this email already exists.');
             }
+
+            const user = await User.create(args);
             const token = signToken(user);
             return { token: token, user: user };
         },
@@ -87,3 +88,4 @@ const resolvers = {
 };
 
 module.exports = resolvers;
+
