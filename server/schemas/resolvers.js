@@ -24,17 +24,18 @@ const resolvers = {
     },
 
     Mutation: {
-        createUser: async (parent, args) => {
-            const user = await User.create(args);
-
-            if (!user) {
-                return { message: "Something is wrong!" };
+        addUser: async (parent, args) => {
+            const existingUser = await User.findOne({ email: args.email });
+            if (existingUser) {
+                throw new Error('User with this email already exists.');
             }
+
+            const user = await User.create(args);
             const token = signToken(user);
             return { token: token, user: user };
         },
 
-        login: async (parent, { email, password }) => {
+        loginUser: async (parent, { email, password }) => {
             const user = await User.findOne({ email: email });
             if (!user) {
                 throw AuthenticationError;
@@ -67,7 +68,7 @@ const resolvers = {
             }
         },
 
-        deleteBook: async (parent, args, context) => {
+        removeBook: async (parent, args, context) => {
             if (!context.user) {
                 throw AuthenticationError;
             }
@@ -87,3 +88,4 @@ const resolvers = {
 };
 
 module.exports = resolvers;
+
